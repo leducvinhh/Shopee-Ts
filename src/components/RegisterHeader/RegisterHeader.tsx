@@ -7,7 +7,7 @@ export default function RegisterHeader() {
       <div className='container'>
         <nav className='flex items-end'>
           <Link to='/'>
-            <LogoSvg />
+            <LogoSvg fill='fill-orange' />
           </Link>
           <div className='ml-5 text-xl lg:text-2xl'>Đăng ký</div>
         </nav>

@@ -1,34 +1,75 @@
 import { Link } from 'react-router-dom'
+import { schemaLogin, TLoginSchema } from '@/utils/rules'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+import { useMutation } from 'react-query'
+import { loginAccount } from '@/apis/auth.api'
+import { isAxiosUnprocessableEntityError } from '@/utils/utils'
+import { ResponseApi } from '@/types/utils.type'
+import Input from '@/components/Input'
 
 export default function Login() {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors }
+  } = useForm<TLoginSchema>({
+    resolver: yupResolver(schemaLogin)
+  })
+
+  const registerAccountMutation = useMutation({
+    mutationFn: (body: TLoginSchema) => loginAccount(body)
+  })
+
+  const formSubmitHandler = handleSubmit((data) => {
+    registerAccountMutation.mutate(data, {
+      onSuccess: (data) => {
+        console.log(data)
+      },
+      onError: (error) => {
+        if (isAxiosUnprocessableEntityError<ResponseApi<TLoginSchema>>(error)) {
+          const formError = error.response?.data.data
+
+          if (!formError) return
+
+          Object.keys(formError).forEach((key) => {
+            setError(key as keyof TLoginSchema, {
+              message: formError[key as keyof TLoginSchema],
+              type: 'Server'
+            })
+          })
+        }
+      }
+    })
+  })
+
   return (
     <div className='bg-orange'>
       <div className='container'>
         <div className='grid grid-cols-1 py-12 lg:grid-cols-5 lg:py-32 lg:pr-10'>
           <div className='lg:col-span-2 lg:col-start-4'>
-            <form className='rounded bg-white p-10 shadow-sm'>
+            <form className='rounded bg-white p-10 shadow-sm' onSubmit={formSubmitHandler} noValidate>
               <div className='text-2xl'>Đăng Nhập</div>
 
-              <div className='mt-8'>
-                <input
-                  type='email'
-                  name='email'
-                  className='w-full rounded-sm border border-gray-300 p-3 outline-none focus:border-gray-500 focus:shadow-sm'
-                  placeholder='Please enter your email'
-                />
-                <div className='mt-1 min-h-[1rem] text-sm text-red-600'></div>
-              </div>
+              <Input
+                name='email'
+                register={register}
+                className='mt-8'
+                type='email'
+                errorsMessage={errors.email?.message}
+                placeholder='Email'
+              />
 
-              <div className='mt-3'>
-                <input
-                  type='password'
-                  name='password'
-                  autoComplete='on'
-                  className='w-full rounded-sm border border-gray-300 p-3 outline-none focus:border-gray-500 focus:shadow-sm'
-                  placeholder='Please enter your password'
-                />
-                <div className='mt-1 min-h-[1rem] text-sm text-red-600'></div>
-              </div>
+              <Input
+                name='password'
+                register={register}
+                className='mt-2'
+                type='password'
+                errorsMessage={errors.password?.message}
+                placeholder='Password'
+                autoComplete='on'
+              />
 
               <div className='mt-3'>
                 <button
