@@ -44,7 +44,7 @@ export default function Popover({
     transform: false,
     placement
   })
-  const { refs, floatingStyles, context } = data
+  const { refs, floatingStyles, context, middlewareData } = data
   const hover = useHover(context, { handleClose: safePolygon() })
   const focus = useFocus(context)
   const dismiss = useDismiss(context)
@@ -61,7 +61,7 @@ export default function Popover({
             <motion.div
               ref={refs.setFloating}
               style={{
-                transformOrigin: `${data.middlewareData.arrow?.x}px top`,
+                transformOrigin: `${middlewareData.arrow?.x}px top`,
                 ...floatingStyles
               }}
               {...getFloatingProps()}
@@ -74,8 +74,8 @@ export default function Popover({
                 ref={arrowRef}
                 className='absolute z-10 translate-y-[-95%] border-[11px] border-x-transparent border-b-white border-t-transparent'
                 style={{
-                  left: data.middlewareData.arrow?.x,
-                  top: data.middlewareData.arrow?.y
+                  left: middlewareData.arrow?.x,
+                  top: middlewareData.arrow?.y
                 }}
               />
               {renderPopover}

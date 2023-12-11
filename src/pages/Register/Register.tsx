@@ -7,9 +7,15 @@ import { useMutation } from 'react-query'
 import { Link } from 'react-router-dom'
 import { omit } from 'lodash'
 import { isAxiosUnprocessableEntityError } from '@/utils/utils'
-import { ResponseApi } from '@/types/utils.type'
+import { ErrorResponse } from '@/types/utils.type'
+import Button from '@/components/Button'
+import routerName from '@/router/routerName'
+import { useContext } from 'react'
+import { AppContext } from '@/contexts/app.context'
+import { AuthResponse } from '@/types/auth.type'
 
 export default function Register() {
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const {
     register,
     handleSubmit,
@@ -27,13 +33,16 @@ export default function Register() {
     const body = omit(data, ['confirm_password'])
 
     registerAccountMutation.mutate(body, {
-      onSuccess: (data) => {
-        console.log(data)
+      onSuccess: (response) => {
+        const data = response.data as AuthResponse
+
+        setIsAuthenticated(true)
+        setProfile(data.data.user)
       },
+
       onError: (error) => {
-        if (isAxiosUnprocessableEntityError<ResponseApi<Omit<TRegisterSchema, 'confirm_password'>>>(error)) {
+        if (isAxiosUnprocessableEntityError<ErrorResponse<Omit<TRegisterSchema, 'confirm_password'>>>(error)) {
           const formError = error.response?.data.data
-          console.log(formError)
 
           if (!formError) return
 
@@ -101,17 +110,19 @@ export default function Register() {
               />
 
               <div className='mt-2'>
-                <button
+                <Button
+                  isLoading={registerAccountMutation.isLoading}
+                  disabled={registerAccountMutation.isLoading}
                   type='submit'
-                  className='w-full bg-red-500 px-2 py-4 text-center text-sm uppercase text-white hover:bg-red-600'
+                  className='flex w-full items-center justify-center bg-red-500 px-2 py-4 text-sm uppercase text-white hover:bg-red-600'
                 >
                   Register
-                </button>
+                </Button>
               </div>
 
               <div className='mt-8 flex items-center justify-center gap-x-2'>
                 <span className='text-gray-400'>Bạn đã có tài khoản</span>
-                <Link to='/login' className='text-red-400 underline'>
+                <Link to={routerName.login} className='text-red-400 underline'>
                   Đăng Nhập
                 </Link>
               </div>
