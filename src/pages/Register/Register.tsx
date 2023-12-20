@@ -1,4 +1,4 @@
-import { registerAccount } from '@/apis/auth.api'
+import authApi from '@/apis/auth.api'
 import Input from '@/components/Input'
 import { schemaRegister, TRegisterSchema } from '@/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -26,7 +26,7 @@ export default function Register() {
   })
 
   const registerAccountMutation = useMutation({
-    mutationFn: (body: Omit<TRegisterSchema, 'confirm_password'>) => registerAccount(body)
+    mutationFn: (body: Omit<TRegisterSchema, 'confirm_password'>) => authApi.registerAccount(body)
   })
 
   const formSubmitHandler = handleSubmit((data) => {
@@ -77,7 +77,11 @@ export default function Register() {
       <div className='container'>
         <div className='grid grid-cols-1 py-12 lg:grid-cols-5 lg:py-32 lg:pr-10'>
           <div className='lg:col-span-2 lg:col-start-4'>
-            <form className='rounded bg-white p-10 shadow-sm' onSubmit={formSubmitHandler} noValidate>
+            <form
+              className='rounded bg-white p-10 shadow-sm'
+              onSubmit={formSubmitHandler}
+              noValidate
+            >
               <div className='text-2xl'>Đăng Ký</div>
 
               <Input
@@ -122,7 +126,10 @@ export default function Register() {
 
               <div className='mt-8 flex items-center justify-center gap-x-2'>
                 <span className='text-gray-400'>Bạn đã có tài khoản</span>
-                <Link to={routerName.login} className='text-red-400 underline'>
+                <Link
+                  to={routerName.login}
+                  className='text-red-400 underline'
+                >
                   Đăng Nhập
                 </Link>
               </div>

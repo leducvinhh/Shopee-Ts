@@ -3,7 +3,7 @@ import { schemaLogin, TLoginSchema } from '@/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'react-query'
-import { loginAccount } from '@/apis/auth.api'
+import authApi from '@/apis/auth.api'
 import { isAxiosUnprocessableEntityError } from '@/utils/utils'
 import { ErrorResponse } from '@/types/utils.type'
 import Input from '@/components/Input'
@@ -25,7 +25,7 @@ export default function Login() {
   })
 
   const loginMutation = useMutation({
-    mutationFn: (body: TLoginSchema) => loginAccount(body)
+    mutationFn: (body: TLoginSchema) => authApi.loginAccount(body)
   })
 
   const formSubmitHandler = handleSubmit((data) => {
@@ -60,7 +60,11 @@ export default function Login() {
       <div className='container'>
         <div className='grid grid-cols-1 py-12 lg:grid-cols-5 lg:py-32 lg:pr-10'>
           <div className='lg:col-span-2 lg:col-start-4'>
-            <form className='rounded bg-white p-10 shadow-sm' onSubmit={formSubmitHandler} noValidate>
+            <form
+              className='rounded bg-white p-10 shadow-sm'
+              onSubmit={formSubmitHandler}
+              noValidate
+            >
               <div className='text-2xl'>Đăng Nhập</div>
 
               <Input
@@ -95,7 +99,10 @@ export default function Login() {
 
               <div className='mt-8 flex items-center justify-center gap-x-2'>
                 <span className='text-gray-400'>Bạn chưa có tài khoản</span>
-                <Link to={routerName.register} className='text-red-400 underline'>
+                <Link
+                  to={routerName.register}
+                  className='text-red-400 underline'
+                >
                   Đăng Ký
                 </Link>
               </div>

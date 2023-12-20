@@ -8,7 +8,7 @@ import Popover from '../Popover'
 import { useContext } from 'react'
 import { AppContext } from '@/contexts/app.context'
 import { useMutation } from 'react-query'
-import { logout } from '@/apis/auth.api'
+import authApi from '@/apis/auth.api'
 import routerName from '@/router/routerName'
 import { clearAuthFromLS } from '@/utils/auth'
 
@@ -16,7 +16,7 @@ export default function Header() {
   const { isAuthenticated, profile, setIsAuthenticated, setProfile } = useContext(AppContext)
 
   const logoutMutation = useMutation({
-    mutationFn: logout,
+    mutationFn: authApi.logout,
     onSuccess: () => {
       clearAuthFromLS()
 
@@ -50,11 +50,17 @@ export default function Header() {
 
           {!isAuthenticated ? (
             <div className='flex items-center'>
-              <Link to={routerName.register} className='mx-3 capitalize hover:text-white/70'>
+              <Link
+                to={routerName.register}
+                className='mx-3 capitalize hover:text-white/70'
+              >
                 Đăng Ký
               </Link>
               <div className='h-4 border-r-[1px] border-r-white/40'></div>
-              <Link to={routerName.login} className='mx-3 capitalize hover:text-white/70'>
+              <Link
+                to={routerName.login}
+                className='mx-3 capitalize hover:text-white/70'
+              >
                 Đăng nhập
               </Link>
             </div>
@@ -64,10 +70,16 @@ export default function Header() {
               renderPopover={
                 <div className='relative rounded-sm border border-t-0 border-gray-200 bg-white shadow-sm'>
                   <div className='flex flex-col text-left'>
-                    <Link to='/' className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'>
+                    <Link
+                      to='/'
+                      className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
+                    >
                       Tài khoản của tôi
                     </Link>
-                    <Link to='/' className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'>
+                    <Link
+                      to='/'
+                      className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
+                    >
                       Đơn mua
                     </Link>
                     <button
@@ -93,7 +105,10 @@ export default function Header() {
         </div>
 
         <div className='mt-4 grid grid-cols-12 items-end gap-4'>
-          <Link to='/' className='col-span-2'>
+          <Link
+            to='/'
+            className='col-span-2'
+          >
             <LogoSvg fill='fill-white' />
           </Link>
           <form className='col-span-9'>

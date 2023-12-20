@@ -4,6 +4,6 @@ const routerName = {
   register: '/register',
   logout: '/logout',
   profile: '/profile'
-}
+} as const
 
 export default routerName

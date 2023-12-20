@@ -1,4 +1,4 @@
-export default function ChevronSvg() {
+export default function ChevronLeftSvg() {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -6,12 +6,12 @@ export default function ChevronSvg() {
       viewBox='0 0 24 24'
       strokeWidth={1.5}
       stroke='currentColor'
-      className='h-5 w-5'
+      className='h-3 w-3'
     >
       <path
         strokeLinecap='round'
         strokeLinejoin='round'
-        d='M19.5 8.25l-7.5 7.5-7.5-7.5'
+        d='M15.75 19.5L8.25 12l7.5-7.5'
       />
     </svg>
   )

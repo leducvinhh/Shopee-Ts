@@ -53,7 +53,11 @@ export default function Popover({
   const id = useId()
 
   return (
-    <Element className={className} ref={refs.setReference} {...getReferenceProps()}>
+    <Element
+      className={className}
+      ref={refs.setReference}
+      {...getReferenceProps()}
+    >
       {children}
       <FloatingPortal id={id}>
         <AnimatePresence>

@@ -10,7 +10,11 @@ export default function Button(props: ButtonProps) {
   const newClassName = disabled ? className + ' opacity-50 cursor-not-allowed' : className
 
   return (
-    <button className={newClassName} disabled={disabled} {...rest}>
+    <button
+      className={newClassName}
+      disabled={disabled}
+      {...rest}
+    >
       {isLoading && (
         <svg
           aria-hidden='true'
