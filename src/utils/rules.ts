@@ -1,6 +1,16 @@
 import * as yup from 'yup'
 
-const schema = yup.object({
+function testPriceMinMax(this: yup.TestContext<yup.AnyObject>): boolean {
+  const { price_min, price_max } = this.parent as { price_max: string; price_min: string }
+
+  if (price_min !== '' && price_max !== '') {
+    return Number(price_max) >= Number(price_min)
+  }
+
+  return price_min !== '' || price_max !== ''
+}
+
+export const schema = yup.object({
   email: yup
     .string()
     .required('Email is required')
@@ -17,11 +27,25 @@ const schema = yup.object({
     .required('Confirm password is required')
     .min(6, 'Confirm password must be at least 6 characters')
     .max(160, 'Confirm password must not exceed 160 characters')
-    .oneOf([yup.ref('password')], 'The passwords do not match')
+    .oneOf([yup.ref('password')], 'The passwords do not match'),
+
+  price_min: yup.string().test({
+    name: 'price-not-allowed',
+    message: 'Price is not allowed',
+    test: testPriceMinMax
+  }),
+
+  price_max: yup.string().test({
+    name: 'price-not-allowed',
+    message: 'Price is not allowed',
+    test: testPriceMinMax
+  })
 })
 
-export const schemaRegister = schema
+export const schemaRegister = schema.pick(['email', 'password', 'confirm_password'])
 export type TRegisterSchema = yup.InferType<typeof schemaRegister>
 
-export const schemaLogin = schema.omit(['confirm_password'])
+export const schemaLogin = schema.pick(['email', 'password'])
 export type TLoginSchema = yup.InferType<typeof schemaLogin>
+
+export type Schema = yup.InferType<typeof schema>
