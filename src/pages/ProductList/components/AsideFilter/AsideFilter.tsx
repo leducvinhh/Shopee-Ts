@@ -2,7 +2,6 @@ import Button from '@/components/Button'
 import ArrowSvg from '@/components/Svg/ArrowSvg'
 import FilterSvg from '@/components/Svg/FilterSvg'
 import MenuSvg from '@/components/Svg/MenuSvg'
-import StartFullSvg from '@/components/Svg/StartFullSvg'
 import routerName from '@/router/routerName'
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 import { QueryConfig } from '@/pages/ProductList/ProductList'
@@ -13,6 +12,8 @@ import { useForm, Controller } from 'react-hook-form'
 import { schema, type Schema } from '@/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { NoUndefinedField } from '@/types/utils.type'
+import RatingStars from '@/pages/ProductList/components/RatingStars'
+import { omit } from 'lodash'
 
 interface Props {
   queryConfig: QueryConfig
@@ -51,6 +52,15 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
       }).toString()
     })
   })
+
+  console.log(queryConfig)
+
+  const handleRemoveAll = () => {
+    navigate({
+      pathname: routerName.home,
+      search: createSearchParams(omit(queryConfig, ['price_min', 'price_max', 'rating_filter', 'category'])).toString()
+    })
+  }
 
   return (
     <div className='py-4 '>
@@ -162,36 +172,15 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
       <div className='my-4 h-[1px] bg-gray-300' />
 
       <div className='text-sm'>Đánh giá</div>
-      <div className='my-3'>
-        <ul>
-          <li className='py-1 pl-2'>
-            <Link
-              to=''
-              className='flex items-center text-sm'
-            >
-              {Array.from({ length: 5 }).map((_, index) => (
-                <StartFullSvg key={index} />
-              ))}
-              <span>trở lên</span>
-            </Link>
-          </li>
-          <li className='py-1 pl-2'>
-            <Link
-              to=''
-              className='flex items-center text-sm'
-            >
-              {Array.from({ length: 5 }).map((_, index) => (
-                <StartFullSvg key={index} />
-              ))}
-              <span>trở lên</span>
-            </Link>
-          </li>
-        </ul>
-      </div>
+
+      <RatingStars queryConfig={queryConfig} />
 
       <div className='my-4 h-[1px] bg-gray-300' />
 
-      <Button className='flex w-full items-center justify-center bg-orange p-2 text-sm uppercase text-white hover:bg-orange/80'>
+      <Button
+        className='flex w-full items-center justify-center bg-orange p-2 text-sm uppercase text-white hover:bg-orange/80'
+        onClick={handleRemoveAll}
+      >
         Xoá tất cả
       </Button>
     </div>
