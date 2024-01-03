@@ -53,8 +53,6 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
     })
   })
 
-  console.log(queryConfig)
-
   const handleRemoveAll = () => {
     navigate({
       pathname: routerName.home,

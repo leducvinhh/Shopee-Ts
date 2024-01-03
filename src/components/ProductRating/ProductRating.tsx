@@ -1,7 +1,15 @@
 import StartYellowSvg from '@/components/Svg/StartYellowSvg'
 import StartGraySvg from '@/components/Svg/StartGraySvg'
 
-export default function ProductRating({ rating }: { rating: number }) {
+export default function ProductRating({
+  rating,
+  classActive,
+  classNoneActive
+}: {
+  rating: number
+  classActive?: string
+  classNoneActive?: string
+}) {
   const calcWidth = (order: number) => {
     if (rating >= order) {
       return '100%'
@@ -25,9 +33,9 @@ export default function ProductRating({ rating }: { rating: number }) {
             style={{ width: calcWidth(index + 1) }}
             className='absolute left-0 top-0 h-full overflow-hidden'
           >
-            <StartYellowSvg />
+            <StartYellowSvg className={classActive} />
           </div>
-          <StartGraySvg />
+          <StartGraySvg className={classNoneActive} />
         </div>
       ))}
     </div>

@@ -1,4 +1,5 @@
 import ProductRating from '@/components/ProductRating'
+import routerName from '@/router/routerName'
 import { Product as ProductType } from '@/types/product.type'
 import { formatCurrency, formatNumberToSocialStyle } from '@/utils/utils'
 import { Link } from 'react-router-dom'
@@ -9,7 +10,7 @@ interface Props {
 
 export default function Product({ product }: Props) {
   return (
-    <Link to='/'>
+    <Link to={`${routerName.home}${product._id}`}>
       <div className='overflow-hidden rounded-sm bg-white shadow transition-all duration-150 hover:z-[1] hover:translate-y-[-0.04rem] hover:shadow-md'>
         <div className='relative w-full pt-[100%]'>
           <img

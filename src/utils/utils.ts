@@ -22,3 +22,7 @@ export function formatNumberToSocialStyle(value: number): string {
     .replace('.', ',')
     .toLowerCase()
 }
+
+export function rateSale(originalPrice: number, salePrice: number): string {
+  return Math.round(((originalPrice - salePrice) / originalPrice) * 100) + '%'
+}
