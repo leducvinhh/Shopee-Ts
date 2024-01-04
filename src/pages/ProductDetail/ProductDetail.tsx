@@ -5,12 +5,12 @@ import { useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import ProductRating from '@/components/ProductRating'
 import { formatCurrency, formatNumberToSocialStyle, getIdFromSlug, rateSale } from '@/utils/utils'
-import InputNumber from '@/components/InputNumber'
-import MinusSvg from '@/components/Svg/MinusSvg'
-import PlusSvg from '@/components/Svg/PlusSvg'
 import CartSvg from '@/components/Svg/CartSvg'
 import DOMPurify from 'dompurify'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { ProductListConfig } from '@/types/product.type'
+import Product from '../ProductList/components/Product'
+import QuantityController from '@/components/QuantityController'
 
 export default function ProductDetail() {
   const { nameId } = useParams()
@@ -25,11 +25,27 @@ export default function ProductDetail() {
   const [currentIndexImages, setCurrentIndexImages] = useState([0, 5])
   const [activeImage, setActiveImage] = useState('')
   const imageRef = useRef<HTMLImageElement | null>(null)
+  const [buyCount, setBuyCount] = useState(1)
 
   const currentImages = useMemo(
     () => (product ? product.images.slice(...currentIndexImages) : []),
     [product, currentIndexImages]
   )
+
+  const queryConfig: ProductListConfig = {
+    page: '1',
+    limit: '20',
+    category: product?.category._id
+  }
+
+  const { data: productData } = useQuery({
+    queryKey: ['products', queryConfig],
+    queryFn: () => {
+      return productApi.getProducts(queryConfig)
+    },
+    staleTime: 3 * 60 * 1000,
+    enabled: Boolean(product)
+  })
 
   useEffect(() => {
     if (product && product.images.length > 0) setActiveImage(product.images[0])
@@ -80,6 +96,10 @@ export default function ProductDetail() {
     if (imageRef.current) {
       imageRef.current.removeAttribute('style')
     }
+  }
+
+  const handleBuyCount = (value: number) => {
+    setBuyCount(value)
   }
 
   if (!product) return null
@@ -168,25 +188,15 @@ export default function ProductDetail() {
               <div className='mt-8 flex items-center'>
                 <div className='capitalize text-gray-500'>số lượng</div>
 
-                <div className='ml-10 flex items-center'>
-                  <button className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-gray-600'>
-                    <MinusSvg />
-                  </button>
-                  <InputNumber
-                    classNameError='hidden'
-                    value={1}
-                    className=''
-                    classNameInput='h-8 w-14 border-t border-b border-gray-300 p-1 text-center outline-none'
-                  />
+                <QuantityController
+                  max={product.quantity}
+                  value={buyCount}
+                  onType={handleBuyCount}
+                  onIncrease={handleBuyCount}
+                  onDecrease={handleBuyCount}
+                />
 
-                  <div className='flex items-center'>
-                    <button className='flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600'>
-                      <PlusSvg />
-                    </button>
-                  </div>
-                </div>
-
-                <div className='ml-6 text-sm text-gray-500'>{product.quantity} sản phẩm có sẵn</div>
+                <div className='ml-6 text-sm text-gray-500'>{product.quantity} sản phẩm có sẵnQ</div>
               </div>
 
               <div className='mt-8 flex items-center'>
@@ -203,12 +213,32 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      <div className='container'>
-        <div className='mt-8 bg-white p-4 shadow'>
-          <div className='rounded bg-gray-50 p-4 text-lg capitalize text-slate-700'>mô tả sản phẩm</div>
-          <div className='mx-4 mb-4 mt-8 text-sm leading-loose'>
-            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description) }} />
+      <div className='mt-8'>
+        <div className='container'>
+          <div className='mt-8 bg-white p-4 shadow'>
+            <div className='rounded bg-gray-50 p-4 text-lg capitalize text-slate-700'>mô tả sản phẩm</div>
+            <div className='mx-4 mb-4 mt-8 text-sm leading-loose'>
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description) }} />
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div className=' mt-8'>
+        <div className='container'>
+          <div className='uppercase text-gray-400'>có thể bạn cũng thích</div>
+          {productData && (
+            <div className='mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'>
+              {productData.data.data.products.map((product) => (
+                <div
+                  className='col-span-1'
+                  key={product._id}
+                >
+                  <Product product={product} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

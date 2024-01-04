@@ -39,7 +39,8 @@ export const schema = yup.object({
     name: 'price-not-allowed',
     message: 'Price is not allowed',
     test: testPriceMinMax
-  })
+  }),
+  name: yup.string().trim().required('Name is required')
 })
 
 export const schemaRegister = schema.pick(['email', 'password', 'confirm_password'])

@@ -2,7 +2,7 @@ import StartBorder from '@/components/Svg/StartBorder'
 import StartFullSvg from '@/components/Svg/StartFullSvg'
 import routerName from '@/router/routerName'
 import { createSearchParams, useNavigate } from 'react-router-dom'
-import { QueryConfig } from '@/pages/ProductList/ProductList'
+import { QueryConfig } from '@/hooks/useQueryConfig'
 
 interface Props {
   queryConfig: QueryConfig

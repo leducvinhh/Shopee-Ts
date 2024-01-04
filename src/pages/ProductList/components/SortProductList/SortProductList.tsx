@@ -1,7 +1,7 @@
 import ChevronLeftSvg from '@/components/Svg/ChevronLeftSvg'
 import ChevronRightSvg from '@/components/Svg/ChevronRightSvg'
 import { sortBy, order as orderConstant } from '@/constants/product'
-import { QueryConfig } from '@/pages/ProductList/ProductList'
+import { QueryConfig } from '@/hooks/useQueryConfig'
 import routerName from '@/router/routerName'
 import { ProductListConfig } from '@/types/product.type'
 import classNames from 'classnames'

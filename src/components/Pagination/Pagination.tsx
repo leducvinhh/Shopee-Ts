@@ -1,4 +1,4 @@
-import { QueryConfig } from '@/pages/ProductList/ProductList'
+import { QueryConfig } from '@/hooks/useQueryConfig'
 import routerName from '@/router/routerName'
 import classNames from 'classnames'
 import { Link, createSearchParams } from 'react-router-dom'
