@@ -4,7 +4,7 @@ const routerName = {
   register: '/register',
   logout: '/logout',
   profile: '/profile',
-  productDetail: ':id'
+  productDetail: ':nameId'
 } as const
 
 export default routerName
