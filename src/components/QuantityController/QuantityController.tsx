@@ -72,14 +72,12 @@ export default function QuantityController({
         {...rest}
       />
 
-      <div className='flex items-center'>
-        <button
-          className='flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600'
-          onClick={increase}
-        >
-          <PlusSvg />
-        </button>
-      </div>
+      <button
+        className='flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600'
+        onClick={increase}
+      >
+        <PlusSvg />
+      </button>
     </div>
   )
 }

@@ -7,7 +7,7 @@ import CartSvg from '../Svg/CartSvg'
 import Popover from '../Popover'
 import { useContext } from 'react'
 import { AppContext } from '@/contexts/app.context'
-import { useMutation, useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import authApi from '@/apis/auth.api'
 import routerName from '@/router/routerName'
 import { clearAuthFromLS } from '@/utils/auth'
@@ -24,6 +24,7 @@ type FormData = Pick<Schema, 'name'>
 const nameSchema = schema.pick(['name'])
 
 export default function Header() {
+  const queryClient = useQueryClient()
   const queryConfig = useQueryConfig()
   const navigate = useNavigate()
   const MAX_PURCHASES_IN_CART = 5
@@ -44,6 +45,7 @@ export default function Header() {
 
       setIsAuthenticated(false)
       setProfile(null)
+      queryClient.removeQueries({ queryKey: ['purchases', { status: purchasesStatus.inCart }] })
     }
   })
 
@@ -184,7 +186,7 @@ export default function Header() {
               renderPopover={
                 <div>
                   <div className='relative w-[25rem] max-w-[400px] rounded-sm border border-t-0 border-gray-200 bg-white text-sm shadow-lg'>
-                    {purchasesInCart && isAuthenticated ? (
+                    {purchasesInCart ? (
                       <div className='p-2'>
                         <p className='capitalize text-gray-400'>sản phẩm mới thêm</p>
                         <div className='mt-5'>
@@ -218,9 +220,12 @@ export default function Header() {
                               ? `${purchasesInCart.length - MAX_PURCHASES_IN_CART} Thêm hàng vào giỏ`
                               : ''}
                           </div>
-                          <button className='rounded-sm bg-orange px-4 py-2 capitalize text-white hover:opacity-80'>
+                          <Link
+                            to={routerName.cart}
+                            className='rounded-sm bg-orange px-4 py-2 capitalize text-white hover:opacity-80'
+                          >
                             Xem giỏ hàng
-                          </button>
+                          </Link>
                         </div>
                       </div>
                     ) : (
@@ -244,7 +249,7 @@ export default function Header() {
                 className='relative'
               >
                 <CartSvg />
-                {purchasesInCart && isAuthenticated && purchasesInCart?.length > 0 && (
+                {purchasesInCart && purchasesInCart?.length > 0 && (
                   <span className='absolute -right-1/3 top-0 flex w-6 items-center justify-center rounded-2xl bg-white text-xs text-orange'>
                     {purchasesInCart?.length}
                   </span>
