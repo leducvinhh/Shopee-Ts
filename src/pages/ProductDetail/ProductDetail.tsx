@@ -1,7 +1,7 @@
 import productApi from '@/apis/product.api'
 import ChevronLeftSvg from '@/components/Svg/ChevronLeftSvg'
 import ChevronRightSvg from '@/components/Svg/ChevronRightSvg'
-import { useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useParams } from 'react-router-dom'
 import ProductRating from '@/components/ProductRating'
 import { formatCurrency, formatNumberToSocialStyle, getIdFromSlug, rateSale } from '@/utils/utils'
@@ -11,8 +11,13 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ProductListConfig } from '@/types/product.type'
 import Product from '../ProductList/components/Product'
 import QuantityController from '@/components/QuantityController'
+import purchaseApi from '@/apis/purchase.api'
+import { purchasesStatus } from '@/constants/purchase'
+import { toast } from 'react-toastify'
 
 export default function ProductDetail() {
+  const queryClient = useQueryClient()
+
   const { nameId } = useParams()
   const id = getIdFromSlug(nameId as string)
 
@@ -100,6 +105,19 @@ export default function ProductDetail() {
 
   const handleBuyCount = (value: number) => {
     setBuyCount(value)
+  }
+
+  const addToCartMutation = useMutation(purchaseApi.addToCart)
+  const addToCart = () => {
+    addToCartMutation.mutate(
+      { buy_count: buyCount, product_id: product?._id as string },
+      {
+        onSuccess: (data) => {
+          toast.success(data.data.message)
+          queryClient.invalidateQueries({ queryKey: ['purchases', { status: purchasesStatus.inCart }] })
+        }
+      }
+    )
   }
 
   if (!product) return null
@@ -196,11 +214,14 @@ export default function ProductDetail() {
                   onDecrease={handleBuyCount}
                 />
 
-                <div className='ml-6 text-sm text-gray-500'>{product.quantity} sản phẩm có sẵnQ</div>
+                <div className='ml-6 text-sm text-gray-500'>{product.quantity} sản phẩm có sẵn</div>
               </div>
 
               <div className='mt-8 flex items-center'>
-                <button className='flex h-12 items-center justify-center rounded-sm border border-orange bg-orange/10 px-5 capitalize text-orange shadow-sm hover:bg-orange/5'>
+                <button
+                  className='flex h-12 items-center justify-center rounded-sm border border-orange bg-orange/10 px-5 capitalize text-orange shadow-sm hover:bg-orange/5'
+                  onClick={addToCart}
+                >
                   <CartSvg className='mr-[10px] h-5 w-5' />
                   Thêm vào giỏ hàng
                 </button>

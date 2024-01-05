@@ -7,7 +7,7 @@ import CartSvg from '../Svg/CartSvg'
 import Popover from '../Popover'
 import { useContext } from 'react'
 import { AppContext } from '@/contexts/app.context'
-import { useMutation } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import authApi from '@/apis/auth.api'
 import routerName from '@/router/routerName'
 import { clearAuthFromLS } from '@/utils/auth'
@@ -16,6 +16,9 @@ import { useForm } from 'react-hook-form'
 import { Schema, schema } from '@/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { omit } from 'lodash'
+import purchaseApi from '@/apis/purchase.api'
+import { purchasesStatus } from '@/constants/purchase'
+import { formatCurrency } from '@/utils/utils'
 
 type FormData = Pick<Schema, 'name'>
 const nameSchema = schema.pick(['name'])
@@ -23,6 +26,7 @@ const nameSchema = schema.pick(['name'])
 export default function Header() {
   const queryConfig = useQueryConfig()
   const navigate = useNavigate()
+  const MAX_PURCHASES_IN_CART = 5
 
   const { handleSubmit, register } = useForm<FormData>({
     defaultValues: {
@@ -66,6 +70,14 @@ export default function Header() {
       search: createSearchParams(config).toString()
     })
   })
+
+  const { data: purchasesInCartData } = useQuery({
+    queryKey: ['purchases', { status: purchasesStatus.inCart }],
+    queryFn: () => purchaseApi.getPurchases({ status: purchasesStatus.inCart }),
+    enabled: isAuthenticated
+  })
+
+  const purchasesInCart = purchasesInCartData?.data.data
 
   return (
     <header className='bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white'>
@@ -166,115 +178,77 @@ export default function Header() {
               </button>
             </div>
           </form>
-          <div className='col-span-1 justify-self-end'>
+          <div className=' col-span-1 justify-self-end'>
             <Popover
               className='floatingBridge flex cursor-pointer items-center py-1 hover:text-white/70'
               renderPopover={
                 <div>
-                  <div className='relative max-w-[400px] rounded-sm border border-t-0 border-gray-200 bg-white text-sm shadow-lg'>
-                    <div className='p-2'>
-                      <p className='capitalize text-gray-400'>sản phẩm mới thêm</p>
-                      <div className='mt-5'>
-                        <div className='mt-4 flex'>
-                          <div className='flex-shrink-0 rounded-sm border border-gray-200'>
-                            <img
-                              src='https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lev5rhi2g0nra6_tn'
-                              alt=''
-                              className='h-11 w-11  object-cover'
-                            />
-                          </div>
-                          <div className='ml-2 flex-grow overflow-hidden'>
-                            <div className='truncate'>
-                              (Bán chạy) Kệ gỗ đựng văn phòng phẩm để bàn giám đốc ADOTA mã KG22M668
-                            </div>
-                          </div>
-                          <div className='ml-2 shrink-0'>
-                            <div className='text-orange'>₫199.000</div>
-                          </div>
+                  <div className='relative w-[25rem] max-w-[400px] rounded-sm border border-t-0 border-gray-200 bg-white text-sm shadow-lg'>
+                    {purchasesInCart && isAuthenticated ? (
+                      <div className='p-2'>
+                        <p className='capitalize text-gray-400'>sản phẩm mới thêm</p>
+                        <div className='mt-5'>
+                          {purchasesInCart.slice(0, MAX_PURCHASES_IN_CART).map((purchase) => {
+                            return (
+                              <div
+                                className='mt-2 flex py-2 hover:bg-gray-100'
+                                key={purchase._id}
+                              >
+                                <div className='flex-shrink-0 rounded-sm border border-gray-200'>
+                                  <img
+                                    src={purchase.product.image}
+                                    alt={purchase.product.name}
+                                    className='h-11 w-11  object-cover'
+                                  />
+                                </div>
+                                <div className='ml-2 flex-grow overflow-hidden'>
+                                  <div className='truncate'>{purchase.product.name}</div>
+                                </div>
+                                <div className='ml-2 shrink-0'>
+                                  <div className='text-orange'>₫{formatCurrency(purchase.product.price)}</div>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
-                        <div className='mt-4 flex'>
-                          <div className='flex-shrink-0 rounded-sm border border-gray-200'>
-                            <img
-                              src='https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lev5rhi2g0nra6_tn'
-                              alt=''
-                              className='h-11 w-11  object-cover'
-                            />
-                          </div>
-                          <div className='ml-2 flex-grow overflow-hidden'>
-                            <div className='truncate'>
-                              (Bán chạy) Kệ gỗ đựng văn phòng phẩm để bàn giám đốc ADOTA mã KG22M668
-                            </div>
-                          </div>
-                          <div className='ml-2 shrink-0'>
-                            <div className='text-orange'>₫199.000</div>
-                          </div>
-                        </div>
-                        <div className='mt-4 flex'>
-                          <div className='flex-shrink-0 rounded-sm border border-gray-200'>
-                            <img
-                              src='https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lev5rhi2g0nra6_tn'
-                              alt=''
-                              className='h-11 w-11  object-cover'
-                            />
-                          </div>
-                          <div className='ml-2 flex-grow overflow-hidden'>
-                            <div className='truncate'>
-                              (Bán chạy) Kệ gỗ đựng văn phòng phẩm để bàn giám đốc ADOTA mã KG22M668
-                            </div>
-                          </div>
-                          <div className='ml-2 shrink-0'>
-                            <div className='text-orange'>₫199.000</div>
-                          </div>
-                        </div>
-                        <div className='mt-4 flex'>
-                          <div className='flex-shrink-0 rounded-sm border border-gray-200'>
-                            <img
-                              src='https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lev5rhi2g0nra6_tn'
-                              alt=''
-                              className='h-11 w-11  object-cover'
-                            />
-                          </div>
-                          <div className='ml-2 flex-grow overflow-hidden'>
-                            <div className='truncate'>
-                              (Bán chạy) Kệ gỗ đựng văn phòng phẩm để bàn giám đốc ADOTA mã KG22M668
-                            </div>
-                          </div>
-                          <div className='ml-2 shrink-0'>
-                            <div className='text-orange'>₫199.000</div>
-                          </div>
-                        </div>
-                        <div className='mt-4 flex'>
-                          <div className='flex-shrink-0 rounded-sm border border-gray-200'>
-                            <img
-                              src='https://down-vn.img.susercontent.com/file/vn-11134207-7qukw-lev5rhi2g0nra6_tn'
-                              alt=''
-                              className='h-11 w-11  object-cover'
-                            />
-                          </div>
-                          <div className='ml-2 flex-grow overflow-hidden'>
-                            <div className='truncate'>
-                              (Bán chạy) Kệ gỗ đựng văn phòng phẩm để bàn giám đốc ADOTA mã KG22M668
-                            </div>
-                          </div>
-                          <div className='ml-2 shrink-0'>
-                            <div className='text-orange'>₫199.000</div>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className='mt-6 flex items-center justify-between'>
-                        <div className='text-xs capitalize text-gray-500'>thêm vào giỏ hàng</div>
-                        <button className='rounded-sm bg-orange px-4 py-2 capitalize text-white hover:opacity-80'>
-                          Xem giỏ hàng
-                        </button>
+                        <div className='mt-6 flex items-center justify-between'>
+                          <div className='text-xs capitalize text-gray-500'>
+                            {purchasesInCart.length - MAX_PURCHASES_IN_CART > 0
+                              ? `${purchasesInCart.length - MAX_PURCHASES_IN_CART} Thêm hàng vào giỏ`
+                              : ''}
+                          </div>
+                          <button className='rounded-sm bg-orange px-4 py-2 capitalize text-white hover:opacity-80'>
+                            Xem giỏ hàng
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className='flex flex-col items-center justify-center px-2 py-16'>
+                        <div className='h-[100px] w-[100px]'>
+                          <img
+                            src='https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/assets/9bdd8040b334d31946f49e36beaf32db.png'
+                            alt=' no purchases'
+                            className='h-full w-full object-cover'
+                          />
+                        </div>
+                        <p>chưa có sản phẩm</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               }
             >
-              <Link to='/card'>
+              <Link
+                to='/card'
+                className='relative'
+              >
                 <CartSvg />
+                {purchasesInCart && isAuthenticated && purchasesInCart?.length > 0 && (
+                  <span className='absolute -right-1/3 top-0 flex w-6 items-center justify-center rounded-2xl bg-white text-xs text-orange'>
+                    {purchasesInCart?.length}
+                  </span>
+                )}
               </Link>
             </Popover>
           </div>
