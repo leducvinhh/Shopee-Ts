@@ -2,7 +2,7 @@ import HttpStatusCode from '@/constants/httpStatusCode.enum'
 import routerName from '@/router/routerName'
 import axios, { AxiosError, type AxiosInstance } from 'axios'
 import { toast } from 'react-toastify'
-import { getAuthFromLS, setAuthToLS } from './auth'
+import { clearAuthFromLS, getAuthFromLS, setAuthToLS } from './auth'
 import { AuthResponse } from '@/types/auth.type'
 
 class Http {
@@ -59,6 +59,10 @@ class Http {
             const data: any | undefined = error.response?.data
             const message = data?.message || error.message
             toast.error(message)
+          }
+
+          if (error.response?.status === HttpStatusCode.Unauthorized) {
+            clearAuthFromLS()
           }
 
           return Promise.reject(error)

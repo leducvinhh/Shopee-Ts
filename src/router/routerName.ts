@@ -3,7 +3,10 @@ const routerName = {
   login: '/login',
   register: '/register',
   logout: '/logout',
-  profile: '/profile',
+  user: '/user',
+  profile: '/user/profile',
+  changePassword: '/user/change-password',
+  historyPurchase: '/user/history-purchase',
   productDetail: ':nameId',
   cart: '/cart'
 } as const

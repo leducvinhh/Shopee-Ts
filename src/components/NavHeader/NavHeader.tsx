@@ -70,7 +70,7 @@ export default function NavHeader() {
             <div className='relative rounded-sm border border-t-0 border-gray-200 bg-white shadow-sm'>
               <div className='flex flex-col text-left'>
                 <Link
-                  to='/'
+                  to={routerName.profile}
                   className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
                 >
                   Tài khoản của tôi
