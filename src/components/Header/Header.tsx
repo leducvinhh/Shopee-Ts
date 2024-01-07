@@ -1,77 +1,24 @@
-import { Link, createSearchParams, useNavigate } from 'react-router-dom'
-import ChevronSvg from '../Svg/ChevronSvg'
-import GlobalSvg from '../Svg/GlobalSvg'
+import { Link } from 'react-router-dom'
 import LogoSvg from '../Svg/LogoSvg'
 import SearchSvg from '../Svg/SearchSvg'
 import CartSvg from '../Svg/CartSvg'
 import Popover from '../Popover'
 import { useContext } from 'react'
 import { AppContext } from '@/contexts/app.context'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
-import authApi from '@/apis/auth.api'
+import { useQuery } from 'react-query'
 import routerName from '@/router/routerName'
-import { clearAuthFromLS } from '@/utils/auth'
-import useQueryConfig from '@/hooks/useQueryConfig'
-import { useForm } from 'react-hook-form'
-import { Schema, schema } from '@/utils/rules'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { omit } from 'lodash'
 import purchaseApi from '@/apis/purchase.api'
 import { purchasesStatus } from '@/constants/purchase'
 import { formatCurrency } from '@/utils/utils'
+import NavHeader from '../NavHeader'
+import useSearchProducts from '@/hooks/useSearchProducts'
 
-type FormData = Pick<Schema, 'name'>
-const nameSchema = schema.pick(['name'])
+const MAX_PURCHASES_IN_CART = 5
 
 export default function Header() {
-  const queryClient = useQueryClient()
-  const queryConfig = useQueryConfig()
-  const navigate = useNavigate()
-  const MAX_PURCHASES_IN_CART = 5
+  const { register, onSubmitSearch } = useSearchProducts()
 
-  const { handleSubmit, register } = useForm<FormData>({
-    defaultValues: {
-      name: ''
-    },
-    resolver: yupResolver(nameSchema)
-  })
-
-  const { isAuthenticated, profile, setIsAuthenticated, setProfile } = useContext(AppContext)
-
-  const logoutMutation = useMutation({
-    mutationFn: authApi.logout,
-    onSuccess: () => {
-      clearAuthFromLS()
-
-      setIsAuthenticated(false)
-      setProfile(null)
-      queryClient.removeQueries({ queryKey: ['purchases', { status: purchasesStatus.inCart }] })
-    }
-  })
-
-  const handleLogout = () => {
-    logoutMutation.mutate()
-  }
-
-  const onSubmitSearch = handleSubmit((value) => {
-    const config = queryConfig.order
-      ? omit(
-          {
-            ...queryConfig,
-            name: value.name
-          },
-          ['order', 'sort_by']
-        )
-      : {
-          ...queryConfig,
-          name: value.name
-        }
-
-    navigate({
-      pathname: routerName.home,
-      search: createSearchParams(config).toString()
-    })
-  })
+  const { isAuthenticated } = useContext(AppContext)
 
   const { data: purchasesInCartData } = useQuery({
     queryKey: ['purchases', { status: purchasesStatus.inCart }],
@@ -84,85 +31,14 @@ export default function Header() {
   return (
     <header className='bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white'>
       <div className='container'>
-        <div className='flex justify-end'>
-          <Popover
-            className='floatingBridge mr-6 flex cursor-pointer items-center py-1 hover:text-white/70'
-            renderPopover={
-              <div className='relative rounded-sm border border-t-0 border-gray-200 bg-white shadow-lg'>
-                <div className='flex flex-col px-3 py-2'>
-                  <button className='mb-2 px-3 py-2 hover:text-orange'>Tiếng Việt</button>
-                  <button className='px-3 py-2 hover:text-orange'>English</button>
-                </div>
-              </div>
-            }
-          >
-            <GlobalSvg />
-            <span className='mx-1'>Tiếng Việt</span>
-            <ChevronSvg />
-          </Popover>
-
-          {!isAuthenticated ? (
-            <div className='flex items-center'>
-              <Link
-                to={routerName.register}
-                className='mx-3 capitalize hover:text-white/70'
-              >
-                Đăng Ký
-              </Link>
-              <div className='h-4 border-r-[1px] border-r-white/40'></div>
-              <Link
-                to={routerName.login}
-                className='mx-3 capitalize hover:text-white/70'
-              >
-                Đăng nhập
-              </Link>
-            </div>
-          ) : (
-            <Popover
-              className='floatingBridge flex cursor-pointer items-center py-1 hover:text-white/70'
-              renderPopover={
-                <div className='relative rounded-sm border border-t-0 border-gray-200 bg-white shadow-sm'>
-                  <div className='flex flex-col text-left'>
-                    <Link
-                      to='/'
-                      className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
-                    >
-                      Tài khoản của tôi
-                    </Link>
-                    <Link
-                      to='/'
-                      className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
-                    >
-                      Đơn mua
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
-                    >
-                      Đăng xuất
-                    </button>
-                  </div>
-                </div>
-              }
-            >
-              <div className='mr-2 flex h-6 w-6 shrink-0'>
-                <img
-                  src='https://down-vn.img.susercontent.com/file/ee2f0a65cf2f2ca1188a1fae30bfdb59_tn'
-                  alt=''
-                  className='h-full w-full rounded-full object-cover'
-                />
-              </div>
-              <div>{profile?.email}</div>
-            </Popover>
-          )}
-        </div>
+        <NavHeader />
 
         <div className='mt-4 grid grid-cols-12 items-end gap-4'>
           <Link
             to='/'
             className='col-span-2'
           >
-            <LogoSvg fill='fill-white' />
+            <LogoSvg className='h-8 w-full fill-white lg:h-11' />
           </Link>
           <form
             className='col-span-9'
