@@ -2,7 +2,7 @@ import productApi from '@/apis/product.api'
 import ChevronLeftSvg from '@/components/Svg/ChevronLeftSvg'
 import ChevronRightSvg from '@/components/Svg/ChevronRightSvg'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import ProductRating from '@/components/ProductRating'
 import { formatCurrency, formatNumberToSocialStyle, getIdFromSlug, rateSale } from '@/utils/utils'
 import CartSvg from '@/components/Svg/CartSvg'
@@ -14,9 +14,11 @@ import QuantityController from '@/components/QuantityController'
 import purchaseApi from '@/apis/purchase.api'
 import { purchasesStatus } from '@/constants/purchase'
 import { toast } from 'react-toastify'
+import routerName from '@/router/routerName'
 
 export default function ProductDetail() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const { nameId } = useParams()
   const id = getIdFromSlug(nameId as string)
@@ -118,6 +120,17 @@ export default function ProductDetail() {
         }
       }
     )
+  }
+
+  const handleBuyNow = async () => {
+    const res = await purchaseApi.addToCart({ buy_count: buyCount, product_id: product?._id as string })
+    const purchase = res.data.data
+
+    navigate(routerName.cart, {
+      state: {
+        purchasesId: purchase._id
+      }
+    })
   }
 
   if (!product) return null
@@ -225,7 +238,10 @@ export default function ProductDetail() {
                   <CartSvg className='mr-[10px] h-5 w-5' />
                   Thêm vào giỏ hàng
                 </button>
-                <button className='ml-4 flex h-12 min-w-[5rem] items-center justify-center rounded-sm bg-orange px-5 capitalize text-white shadow-sm outline-none hover:bg-orange/90'>
+                <button
+                  className='ml-4 flex h-12 min-w-[5rem] items-center justify-center rounded-sm bg-orange px-5 capitalize text-white shadow-sm outline-none hover:bg-orange/90'
+                  onClick={handleBuyNow}
+                >
                   mua ngay
                 </button>
               </div>

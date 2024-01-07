@@ -2,7 +2,7 @@ import InputNumber, { InputNumberProps } from '@/components/InputNumber'
 import MinusSvg from '@/components/Svg/MinusSvg'
 import PlusSvg from '@/components/Svg/PlusSvg'
 import classNames from 'classnames'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props extends InputNumberProps {
   max?: number
@@ -75,6 +75,12 @@ export default function QuantityController({
       test.current = _value
     }
   }
+
+  useEffect(() => {
+    if (value === undefined) return
+
+    setLocalValue(Number(value) || 1)
+  }, [value])
   return (
     <div className={classNameWrapper + ' flex items-center'}>
       <button

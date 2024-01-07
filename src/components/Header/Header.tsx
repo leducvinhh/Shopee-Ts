@@ -62,7 +62,7 @@ export default function Header() {
               renderPopover={
                 <div>
                   <div className='relative w-[25rem] max-w-[400px] rounded-sm border border-t-0 border-gray-200 bg-white text-sm shadow-lg'>
-                    {purchasesInCart ? (
+                    {purchasesInCart?.length ? (
                       <div className='p-2'>
                         <p className='capitalize text-gray-400'>sản phẩm mới thêm</p>
                         <div className='mt-5'>
