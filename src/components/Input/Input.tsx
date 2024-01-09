@@ -1,5 +1,7 @@
-import { InputHTMLAttributes } from 'react'
+import { InputHTMLAttributes, useState } from 'react'
 import { RegisterOptions, UseFormRegister } from 'react-hook-form'
+import EyeSvg from '../Svg/EyeSvg'
+import EyeSlashSvg from '../Svg/EyeSlashSvg'
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   errorsMessage?: string
@@ -21,14 +23,44 @@ export default function Input({
   ...rest
 }: Props) {
   const registerResult = register && name ? register(name, rules) : null
+  const [openEye, setOpenEye] = useState(false)
+
+  const handleType = () => {
+    if (rest.type === 'password') {
+      return openEye ? 'text' : 'password'
+    }
+
+    return rest.type
+  }
 
   return (
     <div className={className}>
-      <input
-        className={classNameInput}
-        {...registerResult}
-        {...rest}
-      />
+      <div className='relative'>
+        <input
+          className={classNameInput}
+          {...registerResult}
+          {...rest}
+          type={handleType()}
+        />
+
+        {rest.type === 'password' && openEye && (
+          <span
+            className='absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer'
+            onClick={() => setOpenEye(!openEye)}
+          >
+            <EyeSvg />
+          </span>
+        )}
+
+        {rest.type === 'password' && !openEye && (
+          <span
+            className='absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer'
+            onClick={() => setOpenEye(!openEye)}
+          >
+            <EyeSlashSvg />
+          </span>
+        )}
+      </div>
       <div className={classNameError}>{errorsMessage}</div>
     </div>
   )

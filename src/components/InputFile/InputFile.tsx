@@ -1,27 +1,33 @@
-import { InputHTMLAttributes, forwardRef } from 'react'
+import { useRef } from 'react'
 
-const InputFile = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
-  function InputFileInner(props, ref) {
-    return (
-      <>
-        <input
-          className='hidden'
-          type='file'
-          accept='.jpg,.jpeg,.png'
-          ref={ref}
-          // onChange={handleChangeAvatar}
-        />
+interface InputFileProps {
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
 
-        <button
-          className='flex h-10 w-24 items-center justify-center rounded-sm border bg-white text-sm capitalize text-gray-600 shadow-sm'
-          type='button'
-          onClick={() => ref.current?.click()}
-        >
-          Chọn ảnh
-        </button>
-      </>
-    )
-  }
-)
+const InputFile = ({ onChange }: InputFileProps) => {
+  const inputRef = useRef<HTMLInputElement>(null)
+  return (
+    <>
+      <input
+        className='hidden'
+        type='file'
+        accept='.jpg,.jpeg,.png'
+        ref={inputRef}
+        onChange={onChange}
+        onClick={(e) => {
+          ;(e.target as HTMLInputElement).value = ''
+        }}
+      />
+
+      <button
+        className='flex h-10 w-24 items-center justify-center rounded-sm border bg-white text-sm capitalize text-gray-600 shadow-sm'
+        type='button'
+        onClick={() => inputRef.current?.click()}
+      >
+        Chọn ảnh
+      </button>
+    </>
+  )
+}
 
 export default InputFile

@@ -7,3 +7,5 @@ export const purchasesStatus = {
   delivered: 4,
   canceled: 5
 } as const
+
+export const listName = ['Tất cả', 'Chờ xác nhận', 'Chờ lấy hàng', 'Đang giao', 'Đã giao', 'Đã hủy']

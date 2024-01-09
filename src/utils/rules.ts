@@ -51,7 +51,12 @@ export const userSchema = yup.object({
   date_of_birth: yup.date().max(new Date(), 'Hãy chon ngày sinh hợp lệ'),
   password: schema.fields.password,
   new_password: schema.fields.password,
-  confirm_password: schema.fields.confirm_password
+  confirm_password: yup
+    .string()
+    .required('Confirm password is required')
+    .min(6, 'Confirm password must be at least 6 characters')
+    .max(160, 'Confirm password must not exceed 160 characters')
+    .oneOf([yup.ref('new_password')], 'The passwords do not match')
 })
 
 export type UserSchema = yup.InferType<typeof userSchema>
