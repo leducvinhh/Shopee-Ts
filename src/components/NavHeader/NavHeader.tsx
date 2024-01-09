@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from 'react-query'
 import authApi from '@/apis/auth.api'
 import { clearAuthFromLS } from '@/utils/auth'
 import { purchasesStatus } from '@/constants/purchase'
+import { generateImageUrl } from '@/utils/utils'
 
 export default function NavHeader() {
   const queryClient = useQueryClient()
@@ -92,11 +93,17 @@ export default function NavHeader() {
           }
         >
           <div className='mr-2 flex h-6 w-6 shrink-0'>
-            <img
-              src='https://down-vn.img.susercontent.com/file/ee2f0a65cf2f2ca1188a1fae30bfdb59_tn'
-              alt=''
-              className='h-full w-full rounded-full object-cover'
-            />
+            {profile?.avatar ? (
+              <img
+                src={generateImageUrl(profile?.avatar)}
+                alt=''
+                className='h-full w-full rounded-full object-cover'
+              />
+            ) : (
+              <span className='flex h-full w-full items-center justify-center rounded-full bg-white text-gray-700'>
+                {profile?.name?.slice(0, 1)}
+              </span>
+            )}
           </div>
           <div>{profile?.email}</div>
         </Popover>

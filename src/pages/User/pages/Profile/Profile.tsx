@@ -4,22 +4,36 @@ import Input from '@/components/Input'
 import InputNumber from '@/components/InputNumber'
 import { UserSchema, userSchema } from '@/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useEffect } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useMutation, useQuery } from 'react-query'
 import DateSelect from '../../components/DateSlect'
 import { toast } from 'react-toastify'
+import { AppContext } from '@/contexts/app.context'
+import { generateImageUrl, isAxiosUnprocessableEntityError } from '@/utils/utils'
+import { ErrorResponse } from '@/types/utils.type'
+import InputFile from '@/components/InputFile'
 
 type FormData = Pick<UserSchema, 'name' | 'address' | 'phone' | 'date_of_birth' | 'avatar'>
+type FormDataError = Omit<FormData, 'date_of_birth'> & { date_of_birth: string }
 const profileSchema = userSchema.pick(['name', 'address', 'phone', 'date_of_birth', 'avatar'])
 
+const MAX_FILE_SIZE = 1024 * 1024
+
 export default function Profile() {
+  const { setProfile, profile: profileContext } = useContext(AppContext)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [avatarUpload, setAvatarUpload] = useState<File>()
+
+  const avatarUrl = avatarUpload ? URL.createObjectURL(avatarUpload) : ''
+
   const {
     handleSubmit,
     register,
     control,
     formState: { errors },
-    setValue
+    setValue,
+    setError
   } = useForm<FormData>({
     defaultValues: {
       name: '',
@@ -37,6 +51,7 @@ export default function Profile() {
   })
 
   const updateProfileMutation = useMutation(userApi.updateProfile)
+  const uploadAvatarMutation = useMutation(userApi.uploadAvatar)
 
   const profile = profileData?.data.data
 
@@ -51,14 +66,57 @@ export default function Profile() {
   }, [profile, setValue])
 
   const onSubmit = handleSubmit(async (data) => {
-    const res = await updateProfileMutation.mutateAsync({
-      ...data,
-      date_of_birth: data.date_of_birth?.toISOString()
-    })
+    try {
+      let imageName = ''
 
-    toast.success(res.data.message)
-    refetch()
+      if (avatarUpload) {
+        const formData = new FormData()
+        formData.append('image', avatarUpload)
+
+        const res = await uploadAvatarMutation.mutateAsync(formData)
+
+        setValue('avatar', res.data.data)
+        imageName = res.data.data
+      }
+
+      const res = await updateProfileMutation.mutateAsync({
+        ...data,
+        date_of_birth: data.date_of_birth?.toISOString(),
+        avatar: imageName
+      })
+
+      localStorage.setItem('profile', JSON.stringify(res.data.data))
+      setProfile(res.data.data)
+      setAvatarUpload(undefined)
+      toast.success(res.data.message)
+      refetch()
+    } catch (error) {
+      if (isAxiosUnprocessableEntityError<ErrorResponse<FormDataError>>(error)) {
+        const formError = error.response?.data.data
+
+        if (!formError) return
+
+        Object.keys(formError).forEach((key) => {
+          setError(key as keyof FormDataError, {
+            message: formError[key as keyof FormDataError],
+            type: 'Server'
+          })
+        })
+      }
+    }
   })
+
+  const handleChangeAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+
+    if (file && file.size <= MAX_FILE_SIZE && file?.type.includes('image')) {
+      setAvatarUpload(file)
+    } else {
+      toast.error('File phải là hình ảnh và nhỏ hơn 1MB')
+    }
+
+    // inputRef.current?.value && (inputRef.current.value = '')
+  }
 
   return (
     <div className='rounded-sm bg-white px-2 pb-10 shadow md:px-7 md:pb-20'>
@@ -142,7 +200,7 @@ export default function Profile() {
             <div className='truncate pt-3 capitalize md:w-[20%] md:text-right' />
             <div className='md:w-[80%] md:pl-5'>
               <Button
-                className='flex h-9 items-center rounded-sm bg-orange px-4 px-5 text-center text-sm text-white hover:bg-orange/80'
+                className='flex h-9 items-center rounded-sm bg-orange px-5 text-center text-sm text-white hover:bg-orange/80'
                 type='submit'
               >
                 Lưu
@@ -155,26 +213,16 @@ export default function Profile() {
           <div className='flex flex-col items-center'>
             <div className='my-5 h-24 w-24'>
               <img
-                src='https://down-vn.img.susercontent.com/file/ee2f0a65cf2f2ca1188a1fae30bfdb59'
-                alt=''
-                className='h-full w-full rounded-full object-cover'
+                src={avatarUrl || generateImageUrl(profileContext?.avatar)}
+                alt='avatar'
+                className='h-full w-full cursor-pointer rounded-full object-cover'
+                onClick={() => inputRef.current?.click()}
               />
             </div>
 
-            <input
-              className='hidden'
-              type='file'
-              accept='.jpg,.jpeg,.png'
-            />
+            <InputFile ref={inputRef} />
 
-            <button
-              className='flex h-10 w-24 items-center justify-center rounded-sm border bg-white text-sm capitalize text-gray-600 shadow-sm'
-              type='button'
-            >
-              Chọn ảnh
-            </button>
-
-            <div className='mt-3 text-gray-400'>Dụng lượng file tối đa 1 MB</div>
+            <div className='mt-3 text-gray-400'>Dụng lượng file tối đa 1 MBI</div>
             <div className='text-gray-400'>Định dạng:.JPEG, .PNG</div>
           </div>
         </div>

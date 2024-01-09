@@ -1,3 +1,4 @@
+import config from '@/constants/config'
 import HttpStatusCode from '@/constants/httpStatusCode.enum'
 import axios, { AxiosError } from 'axios'
 
@@ -41,4 +42,8 @@ export const getIdFromSlug = (slug: string) => {
   const arr = slug.split('-i.')
 
   return arr[arr.length - 1]
+}
+
+export const generateImageUrl = (imageName?: string) => {
+  return imageName ? `${config.baseUrl}images/${imageName}` : 'https://via.placeholder.com/150'
 }

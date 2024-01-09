@@ -4,6 +4,7 @@ import axios, { AxiosError, type AxiosInstance } from 'axios'
 import { toast } from 'react-toastify'
 import { clearAuthFromLS, getAuthFromLS, setAuthToLS } from './auth'
 import { AuthResponse } from '@/types/auth.type'
+import config from '@/constants/config'
 
 class Http {
   instance: AxiosInstance
@@ -12,7 +13,7 @@ class Http {
   constructor() {
     this.accessToken = getAuthFromLS().token
     ;(this.instance = axios.create({
-      baseURL: 'https://api-ecom.duthanhduoc.com/',
+      baseURL: config.baseUrl,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'

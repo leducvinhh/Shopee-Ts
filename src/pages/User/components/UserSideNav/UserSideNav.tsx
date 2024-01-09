@@ -1,10 +1,15 @@
 import EditSvg from '@/components/Svg/EditSvg'
 import PurchaseSvg from '@/components/Svg/PurchaseSvg'
 import UserSvg from '@/components/Svg/UserSvg'
+import { AppContext } from '@/contexts/app.context'
 import routerName from '@/router/routerName'
-import { Link } from 'react-router-dom'
+import { generateImageUrl } from '@/utils/utils'
+import classNames from 'classnames'
+import { useContext } from 'react'
+import { Link, NavLink } from 'react-router-dom'
 
 export default function UserSideNav() {
+  const { profile } = useContext(AppContext)
   return (
     <div>
       <div className='flex items-start border-b border-b-gray-200 py-4'>
@@ -12,14 +17,20 @@ export default function UserSideNav() {
           to={routerName.profile}
           className='h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-black/10'
         >
-          <img
-            className='h-full w-full object-cover'
-            src='https://down-vn.img.susercontent.com/file/ee2f0a65cf2f2ca1188a1fae30bfdb59_tn'
-            alt='avatar'
-          />
+          {profile?.avatar ? (
+            <img
+              className='h-full w-full object-cover'
+              src={generateImageUrl(profile?.avatar)}
+              alt='avatar'
+            />
+          ) : (
+            <span className='flex h-full w-full items-center justify-center rounded-full bg-white text-gray-700'>
+              {profile?.name?.slice(0, 1)}
+            </span>
+          )}
         </Link>
         <div className='flex-grow pl-4'>
-          <div className='mb-1 truncate font-semibold text-gray-600'>ldvinh</div>
+          <div className='mb-1 truncate font-semibold text-gray-600'>{profile?.name}</div>
           <Link
             to={routerName.profile}
             className='flex items-center capitalize text-gray-500'
@@ -31,27 +42,42 @@ export default function UserSideNav() {
       </div>
 
       <div className='mt-7'>
-        <Link
+        <NavLink
           to={routerName.profile}
-          className='mb-4 flex items-center gap-2 capitalize text-orange transition-colors'
+          className={({ isActive }) =>
+            classNames('mb-4 flex items-center gap-2 capitalize  transition-colors', {
+              'text-orange': isActive,
+              'text-gray-600': !isActive
+            })
+          }
         >
           <UserSvg />
           Tài khoản của tôi
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to={routerName.changePassword}
-          className='mb-4 flex items-center gap-2 capitalize text-gray-600 transition-colors'
+          className={({ isActive }) =>
+            classNames('mb-4 flex items-center gap-2 capitalize  transition-colors', {
+              'text-orange': isActive,
+              'text-gray-600': !isActive
+            })
+          }
         >
           <EditSvg />
           Đổi mật khẩu
-        </Link>
-        <Link
+        </NavLink>
+        <NavLink
           to={routerName.historyPurchase}
-          className='flex items-center gap-2 capitalize text-gray-600 transition-colors'
+          className={({ isActive }) =>
+            classNames('mb-4 flex items-center gap-2 capitalize  transition-colors', {
+              'text-orange': isActive,
+              'text-gray-600': !isActive
+            })
+          }
         >
           <PurchaseSvg />
           Đơn mua
-        </Link>
+        </NavLink>
       </div>
     </div>
   )
