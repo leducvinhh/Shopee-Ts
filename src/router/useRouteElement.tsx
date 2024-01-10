@@ -1,40 +1,33 @@
-import { Navigate, Outlet, useRoutes } from 'react-router-dom'
-import ProductList from '@/pages/ProductList'
-import Login from '@/pages/Login'
-import Register from '@/pages/Register'
-import RegisterLayout from '@/layouts/RegisterLayout'
-import MainLayout from '@/layouts/MainLayout'
-import { useContext } from 'react'
-import { AppContext } from '@/contexts/app.context'
-import routerName from './routerName'
-import ProductDetail from '@/pages/ProductDetail'
-import Cart from '@/pages/Cart'
 import CartLayout from '@/layouts/CartLayout'
+import MainLayout from '@/layouts/MainLayout'
+import RegisterLayout from '@/layouts/RegisterLayout'
 import UserLayout from '@/pages/User/layouts/UserLayout'
-import Profile from '@/pages/User/pages/Profile'
-import ChangePassword from '@/pages/User/pages/ChangePassword'
-import HistoryPurchase from '@/pages/User/pages/HistoryPurchase'
-
-function ProtectedRoutes() {
-  const { isAuthenticated } = useContext(AppContext)
-
-  return isAuthenticated ? <Outlet /> : <Navigate to={routerName.login} />
-}
-
-function RejectRoutes() {
-  const { isAuthenticated } = useContext(AppContext)
-
-  return !isAuthenticated ? <Outlet /> : <Navigate to={routerName.home} />
-}
+import { Suspense, lazy } from 'react'
+import { useRoutes } from 'react-router-dom'
+import { AuthGuard } from './guard/AuthGuard'
+import { NotAuthGuard } from './guard/NotAuthGuard'
+import routerName from './routerName'
 
 export default function useRouteElement() {
+  const Login = lazy(() => import('@/pages/Login'))
+  const Cart = lazy(() => import('@/pages/Cart'))
+  const Register = lazy(() => import('@/pages/Register'))
+  const Profile = lazy(() => import('@/pages/User/pages/Profile'))
+  const ChangePassword = lazy(() => import('@/pages/User/pages/ChangePassword'))
+  const HistoryPurchase = lazy(() => import('@/pages/User/pages/HistoryPurchase'))
+  const ProductList = lazy(() => import('@/pages/ProductList'))
+  const ProductDetail = lazy(() => import('@/pages/ProductDetail'))
+  const NotFound = lazy(() => import('@/pages/NotFound'))
+
   const routeElement = useRoutes([
     {
       path: routerName.home,
       index: true,
       element: (
         <MainLayout>
-          <ProductList />
+          <Suspense>
+            <ProductList />
+          </Suspense>
         </MainLayout>
       )
     },
@@ -43,13 +36,15 @@ export default function useRouteElement() {
       index: true,
       element: (
         <MainLayout>
-          <ProductDetail />
+          <Suspense>
+            <ProductDetail />
+          </Suspense>
         </MainLayout>
       )
     },
     {
       path: '',
-      element: <ProtectedRoutes />,
+      element: <AuthGuard />,
       children: [
         {
           path: routerName.user,
@@ -61,15 +56,27 @@ export default function useRouteElement() {
           children: [
             {
               path: routerName.profile,
-              element: <Profile />
+              element: (
+                <Suspense>
+                  <Profile />
+                </Suspense>
+              )
             },
             {
               path: routerName.changePassword,
-              element: <ChangePassword />
+              element: (
+                <Suspense>
+                  <ChangePassword />
+                </Suspense>
+              )
             },
             {
               path: routerName.historyPurchase,
-              element: <HistoryPurchase />
+              element: (
+                <Suspense>
+                  <HistoryPurchase />
+                </Suspense>
+              )
             }
           ]
         },
@@ -77,29 +84,25 @@ export default function useRouteElement() {
           path: routerName.cart,
           element: (
             <CartLayout>
-              <Cart />
+              <Suspense>
+                <Cart />
+              </Suspense>
             </CartLayout>
-          )
-        },
-        {
-          path: '*',
-          element: (
-            <MainLayout>
-              <div>404</div>
-            </MainLayout>
           )
         }
       ]
     },
     {
       path: '',
-      element: <RejectRoutes />,
+      element: <NotAuthGuard />,
       children: [
         {
           path: routerName.login,
           element: (
             <RegisterLayout>
-              <Login />
+              <Suspense>
+                <Login />
+              </Suspense>
             </RegisterLayout>
           )
         },
@@ -107,11 +110,21 @@ export default function useRouteElement() {
           path: routerName.register,
           element: (
             <RegisterLayout>
-              <Register />
+              <Suspense>
+                <Register />
+              </Suspense>
             </RegisterLayout>
           )
         }
       ]
+    },
+    {
+      path: '*',
+      element: (
+        <MainLayout>
+          <NotFound />
+        </MainLayout>
+      )
     }
   ])
 

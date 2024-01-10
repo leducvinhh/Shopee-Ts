@@ -5,7 +5,7 @@ import { QueryConfig } from '@/hooks/useQueryConfig'
 import routerName from '@/router/routerName'
 import { ProductListConfig } from '@/types/product.type'
 import classNames from 'classnames'
-import { omit } from 'lodash'
+import omit from 'lodash/omit'
 import { Link, createSearchParams, useNavigate } from 'react-router-dom'
 
 interface Props {

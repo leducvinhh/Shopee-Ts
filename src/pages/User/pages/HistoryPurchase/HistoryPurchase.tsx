@@ -5,7 +5,7 @@ import routerName from '@/router/routerName'
 import { PurchaseListStatus } from '@/types/purchase.type'
 import { formatCurrency, generateSlug } from '@/utils/utils'
 import classNames from 'classnames'
-import { omit } from 'lodash'
+import omit from 'lodash/omit'
 import { useQuery } from 'react-query'
 import { Link, createSearchParams } from 'react-router-dom'
 

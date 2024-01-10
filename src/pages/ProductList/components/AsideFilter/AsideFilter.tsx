@@ -13,7 +13,8 @@ import { schema, type Schema } from '@/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { NoUndefinedField } from '@/types/utils.type'
 import RatingStars from '@/pages/ProductList/components/RatingStars'
-import { omit } from 'lodash'
+import omit from 'lodash/omit'
+import { ObjectSchema } from 'yup'
 
 interface Props {
   queryConfig: QueryConfig
@@ -39,7 +40,7 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
       price_min: '',
       price_max: ''
     },
-    resolver: yupResolver(priceSchema),
+    resolver: yupResolver<FormData>(priceSchema as ObjectSchema<FormData>),
     shouldFocusError: false
   })
 
