@@ -9,6 +9,9 @@ import { AppProvider } from './contexts/app.context.tsx'
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.tsx'
 import AppError from './components/AppError/AppError.tsx'
 
+import '@/i18n/index.ts'
+import { HelmetProvider } from 'react-helmet-async'
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -24,7 +27,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <ErrorBoundary fallback={<AppError />}>
-            <App />
+            <HelmetProvider>
+              <App />
+            </HelmetProvider>
           </ErrorBoundary>
         </AppProvider>
         <ReactQueryDevtools initialIsOpen={false} />

@@ -15,6 +15,7 @@ import { NoUndefinedField } from '@/types/utils.type'
 import RatingStars from '@/pages/ProductList/components/RatingStars'
 import omit from 'lodash/omit'
 import { ObjectSchema } from 'yup'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   queryConfig: QueryConfig
@@ -27,6 +28,7 @@ const priceSchema = schema.pick(['price_min', 'price_max'])
 
 export default function AsideFilter({ queryConfig, categories }: Props) {
   const navigate = useNavigate()
+  const { t } = useTranslation('product')
 
   const { category } = queryConfig
 
@@ -70,7 +72,7 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
         })}
       >
         <MenuSvg />
-        Tất cả danh mục
+        {t('allCategory')}
       </Link>
 
       <div className='my-4 h-[1px] bg-gray-300' />

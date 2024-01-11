@@ -12,6 +12,7 @@ import findIndex from 'lodash/findIndex'
 import keyBy from 'lodash/keyBy'
 import { toast } from 'react-toastify'
 import { AppContext } from '@/contexts/app.context'
+import { Helmet } from 'react-helmet-async'
 
 export default function Cart() {
   const { extendedPurchases, setExtendedPurchases } = useContext(AppContext)
@@ -160,6 +161,13 @@ export default function Cart() {
 
   return (
     <div className='bg-neutral-100 py-16'>
+      <Helmet>
+        <title>Giỏ hàng</title>
+        <meta
+          name='description'
+          content='Giỏ hàng'
+        />
+      </Helmet>
       {extendedPurchases.length ? (
         <div className='container'>
           <div className='overflow-auto'>

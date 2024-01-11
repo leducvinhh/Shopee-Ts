@@ -10,9 +10,13 @@ import authApi from '@/apis/auth.api'
 import { clearAuthFromLS } from '@/utils/auth'
 import { purchasesStatus } from '@/constants/purchase'
 import { generateImageUrl } from '@/utils/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function NavHeader() {
   const queryClient = useQueryClient()
+  const { t, i18n } = useTranslation(['product', 'home'])
+
+  const textLanguage = i18n.language === 'vi' ? 'Tiếng Việt' : 'English'
 
   const { isAuthenticated, profile, setIsAuthenticated, setProfile } = useContext(AppContext)
 
@@ -30,6 +34,10 @@ export default function NavHeader() {
   const handleLogout = () => {
     logoutMutation.mutate()
   }
+
+  const handleLanguageChange = (lng: 'vi' | 'en') => {
+    i18n.changeLanguage(lng)
+  }
   return (
     <div className='flex justify-end'>
       <Popover
@@ -37,14 +45,24 @@ export default function NavHeader() {
         renderPopover={
           <div className='relative rounded-sm border border-t-0 border-gray-200 bg-white shadow-lg'>
             <div className='flex flex-col px-3 py-2'>
-              <button className='mb-2 px-3 py-2 hover:text-orange'>Tiếng Việt</button>
-              <button className='px-3 py-2 hover:text-orange'>English</button>
+              <button
+                className='mb-2 px-3 py-2 hover:text-orange'
+                onClick={() => handleLanguageChange('vi')}
+              >
+                Tiếng Việt
+              </button>
+              <button
+                className='px-3 py-2 hover:text-orange'
+                onClick={() => handleLanguageChange('en')}
+              >
+                English
+              </button>
             </div>
           </div>
         }
       >
         <GlobalSvg />
-        <span className='mx-1'>Tiếng Việt</span>
+        <span className='mx-1'>{textLanguage}</span>
         <ChevronSvg />
       </Popover>
 
@@ -74,19 +92,19 @@ export default function NavHeader() {
                   to={routerName.profile}
                   className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
                 >
-                  Tài khoản của tôi
+                  {t('home:myAccount')}
                 </Link>
                 <Link
                   to='/'
                   className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
                 >
-                  Đơn mua
+                  {t('home:purchase')}
                 </Link>
                 <button
                   onClick={handleLogout}
                   className='inline-flex w-full p-3 hover:bg-[#fafafa] hover:text-[#00bfa5]'
                 >
-                  Đăng xuất
+                  {t('home:logout')}
                 </button>
               </div>
             </div>
