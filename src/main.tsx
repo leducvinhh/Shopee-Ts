@@ -15,8 +15,8 @@ import { HelmetProvider } from 'react-helmet-async'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      retry: 0
+      refetchOnWindowFocus: false
+      // retry: 0
     }
   }
 })

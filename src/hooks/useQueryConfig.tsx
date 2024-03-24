@@ -13,7 +13,7 @@ export default function useQueryConfig() {
   const queryConfig: QueryConfig = omitBy(
     {
       page: queryParams.page || '1',
-      limit: queryParams.limit || '20',
+      limit: queryParams.limit || '5',
       sort_by: queryParams.sort_by,
       order: queryParams.order,
       exclude: queryParams.exclude,

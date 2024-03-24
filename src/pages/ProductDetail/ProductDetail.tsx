@@ -41,7 +41,7 @@ export default function ProductDetail() {
 
   const queryConfig: ProductListConfig = {
     page: '1',
-    limit: '20',
+    limit: '5',
     category: product?.category._id
   }
 
